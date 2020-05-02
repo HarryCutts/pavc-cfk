@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+# TODO: install apps
+
+DCONF_DIR=/etc/dconf
+DCONF_PROFILE="$DCONF_DIR/profile/user"
+DCONF_DB_DIR="$DCONF_DIR/db/local.d"
+
+backup() {
+	if [ -e "$1" ]; then
+		echo "WARNING: $1 already exists, and has been backed up as $1.bak."
+		mv "$1" "$1.bak"
+	fi
+}
+
+echo "Creating dconf files."
+backup $DCONF_PROFILE
+cat > $DCONF_PROFILE <<EOF
+user-db:user
+system-db:local
+EOF
+
+mkdir -p $DCONF_DB_DIR
+backup $DCONF_DB_DIR/00-favorite-apps
+cat > $DCONF_DB_DIR/00-favorite-apps <<EOF
+[org/gnome/shell]
+favorite-apps = ['firefox.desktop', 'zoom-client_zoom-client.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'scratch.desktop', 'snap-store_ubuntu-software.desktop', 'yelp.desktop']
+EOF
+
+
+backup $DCONF_DB_DIR/01-default-background
+cat > $DCONF_DB_DIR/01-default-background <<EOF
+[org/gnome/desktop/background]
+picture-options = 'zoom'
+picture-uri='file:///usr/share/backgrounds/brad-huchteman-stone-mountain.jpg'
+EOF
+
+# This doesn't seem to take effect after the ship stage, for some reason.
+backup $DCONF_DB_DIR/02-disable-workspaces
+cat > $DCONF_DB_DIR/02-disable-workspaces <<EOF
+[org/gnome/mutter]
+dynamic-workspaces = false
+
+[org/gnome/desktop/wm/preferences]
+num-workspaces = 1
+EOF
+
+echo "Updating dconf database."
+dconf update
