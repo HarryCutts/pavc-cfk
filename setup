@@ -24,7 +24,12 @@ if [ -e "$METADATA_FILE" ]; then
 	fi
 fi
 
-# TODO: install apps
+if [ "$PREFIX" == "" ]; then
+	echo "Installing Zoom..."
+	snap install zoom-client
+	echo "Installing Scratch..."
+	apt install scratch
+fi
 
 DCONF_DIR=$PREFIX/etc/dconf
 DCONF_PROFILE="$DCONF_DIR/profile/user"
@@ -50,7 +55,6 @@ cat > $DCONF_DB_DIR/00-favorite-apps <<EOF
 [org/gnome/shell]
 favorite-apps = ['firefox.desktop', 'zoom-client_zoom-client.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'scratch.desktop', 'snap-store_ubuntu-software.desktop', 'yelp.desktop']
 EOF
-
 
 backup $DCONF_DB_DIR/01-default-background
 cat > $DCONF_DB_DIR/01-default-background <<EOF
