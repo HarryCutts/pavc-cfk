@@ -2,6 +2,7 @@
 
 set -e
 
+# Set PREFIX to something (e.g. /tmp/test) to do a dry run in a test directory.
 PREFIX=
 
 ask() {
@@ -68,8 +69,10 @@ dynamic-workspaces = false
 num-workspaces = 1
 EOF
 
-echo "Updating dconf database."
-dconf update
+if [ "$PREFIX" == "" ]; then
+	echo "Updating dconf database."
+	dconf update
+fi
 
 SKEL_DESKTOP=$PREFIX/etc/skel/Desktop
 echo "Making $SKEL_DESKTOP. Don't forget to put welcome notes in it!"
