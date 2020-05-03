@@ -49,3 +49,27 @@ EOF
 
 echo "Updating dconf database."
 dconf update
+
+ask() {
+	while true; do
+		read -n 1 -p "$1 [Yn]" answer
+		echo
+		case $answer in
+			y|Y|"") return 0;;
+			n|N) return 1;;
+		esac
+		echo "Please answer y or n."
+	done
+}
+
+PAM_ENV=$PREFIX/etc/security/pam_env.conf
+
+if ask "Does this device have a touchscreen?"; then
+	if grep -m 1 "MOZ_USE_XINPUT2" $PAM_ENV; then
+		echo "WARNING: $PAM_ENV already has an entry for MOZ_USE_XINPUT2. Make sure to reconcile the two."
+	fi
+	echo "# For touchscreen support in Firefox. (https://superuser.com/a/1485044/138552)" >> $PAM_ENV
+	echo "MOZ_USE_XINPUT2 DEFAULT=1" >> $PAM_ENV
+fi
+
+echo "Done. Please log out and back in for the changes to take effect."
