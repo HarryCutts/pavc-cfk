@@ -71,6 +71,10 @@ EOF
 echo "Updating dconf database."
 dconf update
 
+SKEL_DESKTOP=$PREFIX/etc/skel/Desktop
+echo "Making $SKEL_DESKTOP. Don't forget to put welcome notes in it!"
+mkdir -p $SKEL_DESKTOP
+
 PAM_ENV=$PREFIX/etc/security/pam_env.conf
 
 has_touchscreen=false
