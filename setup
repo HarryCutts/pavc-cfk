@@ -2,9 +2,30 @@
 
 set -e
 
+PREFIX=
+
+ask() {
+	while true; do
+		read -n 1 -p "$1 [Yn] " answer
+		echo
+		case $answer in
+			y|Y|"") return 0;;
+			n|N) return 1;;
+		esac
+		echo "Please answer y or n."
+	done
+}
+
+METADATA_FILE=$PREFIX/opt/cfk-metadata.yaml
+if [ -e "$METADATA_FILE" ]; then
+	if ask "The metadata file at $METADATA_FILE already exists. Abort?"; then
+		exit 1
+	fi
+fi
+
 # TODO: install apps
 
-DCONF_DIR=/etc/dconf
+DCONF_DIR=$PREFIX/etc/dconf
 DCONF_PROFILE="$DCONF_DIR/profile/user"
 DCONF_DB_DIR="$DCONF_DIR/db/local.d"
 
@@ -50,26 +71,22 @@ EOF
 echo "Updating dconf database."
 dconf update
 
-ask() {
-	while true; do
-		read -n 1 -p "$1 [Yn]" answer
-		echo
-		case $answer in
-			y|Y|"") return 0;;
-			n|N) return 1;;
-		esac
-		echo "Please answer y or n."
-	done
-}
-
 PAM_ENV=$PREFIX/etc/security/pam_env.conf
 
+has_touchscreen=false
 if ask "Does this device have a touchscreen?"; then
 	if grep -m 1 "MOZ_USE_XINPUT2" $PAM_ENV; then
 		echo "WARNING: $PAM_ENV already has an entry for MOZ_USE_XINPUT2. Make sure to reconcile the two."
 	fi
 	echo "# For touchscreen support in Firefox. (https://superuser.com/a/1485044/138552)" >> $PAM_ENV
 	echo "MOZ_USE_XINPUT2 DEFAULT=1" >> $PAM_ENV
+	has_touchscreen=true
 fi
+
+read -p "What is this device's ID number? " id_number
+touch $METADATA_FILE
+echo "id: $id_number" >> $METADATA_FILE
+echo "preship_setup_date: $(date --iso-8601=seconds)" >> $METADATA_FILE
+echo "has_touchscreen: $has_touchscreen" >> $METADATA_FILE
 
 echo "Done. Please log out and back in for the changes to take effect."
