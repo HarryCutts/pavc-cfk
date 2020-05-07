@@ -7,7 +7,7 @@ PREFIX=
 
 ask() {
 	while true; do
-		read -n 1 -p "$1 [Yn] " answer
+		read -n 1 -p "$1 [Y/n] " answer
 		echo
 		case $answer in
 			y|Y|"") return 0;;
@@ -28,7 +28,7 @@ if [ "$PREFIX" == "" ]; then
 	echo "Installing Zoom..."
 	snap install zoom-client
 	echo "Installing Scratch..."
-	apt install scratch
+	apt-get install --yes scratch
 fi
 
 DCONF_DIR=$PREFIX/etc/dconf
