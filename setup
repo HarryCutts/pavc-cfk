@@ -73,6 +73,19 @@ dynamic-workspaces = false
 num-workspaces = 1
 EOF
 
+if cat /proc/bus/input/devices | grep "Vendor=05ac" --after-context=1; then
+	echo "Apple input devices detected. Adding Mac hotkey bindings."
+	# Bind LaunchA (F3) to show the overview, and LaunchB (F4) to the menu
+	# of apps.
+	cat > $DCONF_DB_DIR/03-mac-hotkeys <<EOF
+[org/gnome/desktop/wm/keybindings]
+panel-main-menu = ['LaunchA']
+
+[org/gnome/shell/keybindings]
+toggle-application-view = ['LaunchB']
+EOF
+fi
+
 if [ "$PREFIX" == "" ]; then
 	echo "Updating dconf database."
 	dconf update
