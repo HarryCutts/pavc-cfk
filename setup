@@ -29,6 +29,8 @@ if [ "$PREFIX" == "" ]; then
 	snap install zoom-client
 	echo "Installing Scratch..."
 	apt-get install --yes scratch
+	echo "Installing restricted extras..."
+	apt-get install --yes ubuntu-restricted-extras
 fi
 
 DCONF_DIR=$PREFIX/etc/dconf
